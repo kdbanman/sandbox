@@ -1,0 +1,187 @@
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import com.sleepycat.db.*;
+
+
+public class indexed {
+	
+	public static void start(Database std, String filename){
+		
+		//build hash tables
+		long starttime, performance; //For measuring performance
+		Database secDB = null;
+		Database tDB = null;
+		try{
+			starttime = System.currentTimeMillis();
+			System.out.print("Building <user>,<songs,ratings> secondary table...");
+			secDB = buildsecondary(std);
+			performance = System.currentTimeMillis() - starttime;
+			System.out.println(" Complete! " + performance + "ms");
+
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		try{
+			starttime = System.currentTimeMillis();
+			System.out.print("Building <song>,<users> tertiary table...");
+			tDB = buildtertiary(std);
+			performance = System.currentTimeMillis() - starttime;
+			System.out.println(" Complete! " + performance + "ms");
+
+		}catch(Exception e){
+			System.out.println("Error building secondary tables.");
+			System.out.println(e.getMessage());
+		}
+		
+		//use hash tables to query fast!
+		PrintStream writer = io.writer("indexedanswers.txt", true);
+		BufferedReader qreader = io.reader(filename);
+		String line, send;
+		try{
+			while((line = qreader.readLine()) != null)
+			{
+				line = line.trim();
+				if (line.equals("")) continue;
+				if (!line.equals("")) {
+					System.out.print("Indexed... ");
+					starttime = System.currentTimeMillis();
+					send = top3(line, secDB, tDB);
+					if(send != null)
+						writer.println(send);
+					else
+						System.out.println("Error from ranking search function");
+					performance = System.currentTimeMillis() - starttime;
+					System.out.println(" Complete! " + performance + "ms");
+				}
+			}
+		}catch(IOException ioe){
+			System.out.println(ioe.getMessage());
+		}
+		writer.close();
+
+	}
+	
+	public static String top3(String line, Database secDB, Database tDB) {
+		return line + " HURRRRRR";
+	}
+	
+	public static Database buildtertiary(Database std) {
+		
+		try{
+			//configure new database instance
+			io.deleteFile("tertiarydb");
+			DatabaseConfig dbConfig = new DatabaseConfig();
+			dbConfig.setType(DatabaseType.HASH);
+			dbConfig.setAllowCreate(true);
+			dbConfig.setUnsortedDuplicates(true);
+			Database tdb = new Database("tertiarydb", null, dbConfig);
+			
+			//configure cursors and entries
+			Cursor stdCurs = std.openCursor(null, null);
+			Cursor tCurs = tdb.openCursor(null, null);
+			DatabaseEntry stdKey = new DatabaseEntry();
+			DatabaseEntry stdData = new DatabaseEntry();
+			DatabaseEntry tKey = new DatabaseEntry();
+			DatabaseEntry tData = new DatabaseEntry();
+			System.out.println("got hererererererere");
+			//extract from linearly constructed database to populate <song>,<users> table, making
+			//use of songs grouped by id
+			String currUsers = "";
+			String prevID = "default";
+			boolean firstIter = true;
+			while (stdCurs.getNext(stdKey, stdData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				//get rating data from current row
+				stdKey.setData(null);
+				stdData.setData(null);
+				String[] currIDUser = (new String(stdKey.getData())).split(",");
+				String currID = currIDUser[0].trim();
+				String currUser = currIDUser[1].trim();
+				if (currID.equals(prevID)) {
+					//concatenate new username with current string
+					currUsers += currUser + ",";
+					prevID = currID;
+				} else if (!firstIter) {
+					//insert completed <usernames> into table under key <song id>
+					tKey.setData(prevID.getBytes());
+					tData.setData(currUsers.substring(0, currUsers.length()-2).getBytes());
+					tCurs.put(tKey, tData);
+					tKey.setData(null);
+					tData.setData(null);
+					//DEBUG:
+					System.out.println(prevID+","+currUsers.substring(0, currUsers.length()-2));
+					currUsers = "";
+				}
+				
+			firstIter = false;
+			}
+			
+		} catch (Exception e) {
+			System.out.println(" error creating <song>,<users> tertiary table\n");
+			System.out.println(e.getMessage());
+		}
+		return null; //should never happen
+		
+	}
+	
+	public static Database buildsecondary(Database std){
+		//Parse database loaded
+		try{
+			io.deleteFile("secondarydb");
+			// SecondaryDatabases started
+			DatabaseConfig dbConfig = new DatabaseConfig();
+			dbConfig.setType(DatabaseType.HASH);
+			dbConfig.setAllowCreate(true);
+			dbConfig.setUnsortedDuplicates(true);
+			Database secdb = new Database("secondarydb", null, dbConfig);
+			//Cursors started
+			Cursor stdcursor = std.openCursor(null, null);
+			Cursor secdbcursor = secdb.openCursor(null, null);
+			//Key and Data started
+			DatabaseEntry stdkey = new DatabaseEntry();
+			DatabaseEntry stddata = new DatabaseEntry();
+			DatabaseEntry seckey = new DatabaseEntry();
+			DatabaseEntry secdata = new DatabaseEntry();
+
+			while(stdcursor.getNext(stdkey, stddata, LockMode.DEFAULT) == OperationStatus.SUCCESS){//Writing into secondary db
+				String[] key = new String(stdkey.getData()).split(",");
+				String data = new String(stddata.getData());
+				//DEBUG:
+				//System.out.println("key 0:" + key[0] + " key 1:" + key[1] + " data:" + data);
+				seckey.setData(key[1].getBytes());
+				OperationStatus operation = secdbcursor.getSearchKey(seckey, secdata, LockMode.DEFAULT);
+
+				String b = null;
+				while(operation == OperationStatus.SUCCESS){
+					b = new String(secdata.getData());
+					secdbcursor.delete();
+					operation = secdbcursor.getNextDup(seckey, secdata, LockMode.DEFAULT);
+				}
+				if(b == null){
+					seckey.setData(key[1].getBytes());
+					secdata.setData(("("+key[0]+","+data+")").getBytes());
+					secdb.put(null, seckey, secdata);
+				}
+				if(b != null){
+					secdata.setData(b.concat("("+key[0]+","+data+")").getBytes());
+					secdb.put(null, seckey,secdata);
+				}
+				seckey.setData(null);
+				secdata.setData(null);
+
+				stdkey.setData(null);
+				stddata.setData(null);
+			}
+			//io.debugread(secdb);
+
+			return secdb;
+		}catch(Exception e){
+			System.out.println("Error creating <user>,<song,rating> secondary table!\n");
+			System.out.println(e.getMessage());
+		}
+		return null; //SHOULD NEVER HAPPEN
+	}
+}

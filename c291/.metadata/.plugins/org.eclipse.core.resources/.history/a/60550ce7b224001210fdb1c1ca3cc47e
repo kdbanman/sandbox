@@ -1,0 +1,155 @@
+package user;
+
+import io.InputOutput;
+
+import java.sql.*;
+
+public class one {
+
+	public static void menu(String username, Connection m_con) throws SQLException{
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("***************************");
+			System.out.println("* View/Edit personal info *");
+			System.out.println("***************************\n");
+			System.out.println("Username: " + username);
+			System.out.println("Credits:  " + getCredit(username,m_con));
+			System.out.println("E-mail:   " + getEmail(username,m_con));
+			System.out.println("E-mail Visibility: " + getEmailVisibility(username,m_con));
+			System.out.print("1. Edit E-mail\n2. Edit E-mail visibility\n3. Home\nChoice: ");
+
+			int command = InputOutput.cleanCommand(InputOutput.read());
+			
+			switch (command){
+			case 1:
+				editEmail(username, getEmail(username, m_con), m_con);//Implement e-mail check
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				editEmailVisibility(username, getEmailVisibility(username, m_con), m_con);
+				InputOutput.clearscreen();
+				break;
+			case 3:
+				back = 1;
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+
+		}
+	}
+
+	public static int getCredit(String username, Connection m_con) throws SQLException{
+		int credit = -1;
+		String query = "select credit from customer where username = '" + username + "'"; //THE SQL QUERY
+		Statement stmt = InputOutput.newStatement(m_con);
+		ResultSet rs = InputOutput.execQuery(stmt, query);
+		if (rs.next()) {
+			credit = rs.getInt("credit");
+		} else {
+			System.out.println("Obtain credit failed.  Currently set to -1.");
+		}
+		InputOutput.closeStatement(stmt);
+		return credit;
+	}
+
+	private static String getEmail(String username, Connection m_con) throws SQLException{
+		String email = "a@example.com";
+		String query = "select email from customer where username = '" + username + "'"; //THE SQL QUERY
+		Statement stmt = InputOutput.newStatement(m_con);
+		ResultSet rs = InputOutput.execQuery(stmt, query);
+		if (rs.next()) {
+			email = rs.getString("email");
+		} else {
+			System.out.println("Obtain email failed.  Currently set to a@example.com.");
+		}
+		InputOutput.closeStatement(stmt);
+		return email; //Remember to change this to return the email
+	}
+
+	private static String getEmailVisibility(String username, Connection m_con) throws SQLException{
+		String visibility = "Visibility not set";
+		String query = "select emailvisibility from customer where username = '" + username + "'"; //THE SQL QUERY
+		Statement stmt = InputOutput.newStatement(m_con);
+		ResultSet rs = InputOutput.execQuery(stmt, query);
+		if (rs.next()) {
+			visibility = rs.getString("emailvisibility");
+		} else {
+			System.out.println("Obtain email failed.  Currently set to a@example.com.");
+		}
+		InputOutput.closeStatement(stmt);
+		return visibility; //Remember to change this to return the email visibilty
+	}
+	private static void editEmail(String username, String currentEmail, Connection m_con){
+		int answered = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("***************");
+			System.out.println("* Edit E-mail *");
+			System.out.println("***************");
+			System.out.println("ATTENTION: New e-mail must be valid (must contain  @ and then .)");
+			System.out.println("Current Email: "+currentEmail);
+			System.out.print("New Email    : ");
+			String newEmail = InputOutput.read();
+			if(InputOutput.validEmail(newEmail) == true){
+				String query = "update customer set email= '" + newEmail + "' where username='"+username+"'"; //THE SQL QUERY
+				System.out.println(query);
+				Statement stmt = InputOutput.newStatement(m_con);
+				System.out.println("here even?");
+				InputOutput.execUpdate(stmt, query);
+				System.out.println("got here");
+				InputOutput.closeStatement(stmt);
+				answered = 1;
+				System.out.println("E-mail change successful!");
+			}
+			else
+			{
+				System.out.println("E-mail is not valid, please try again");
+			}
+			InputOutput.threadsleep(3000);
+		}
+	}
+
+	private static void editEmailVisibility(String username, String currentVisibility, Connection m_con){
+		int answered = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("**************************");
+			System.out.println("* Edit E-mail Visibility *");
+			System.out.println("**************************");
+			System.out.println("Current Email: "+currentVisibility);
+			System.out.print("1. Private\n2. Friends Only\n3. Public\nChange visibility to: ");
+			
+			int command = InputOutput.cleanCommand(InputOutput.read());
+			String notification = "";
+			String vis = "";
+			switch (command){
+			case 1:
+				vis = "N";
+				answered = 1;
+				notification = "E-mail Visibility now set to Private";
+			case 2:
+				vis = "F";
+				answered = 1;
+				notification = "E-mail Visibility now set to Friends Only";
+			case 3:
+				vis = "A";
+				answered = 1;
+				notification = "E-mail Visibility now set to Public";
+			default:
+				InputOutput.invalidcom();
+				InputOutput.threadsleep(3000);
+				break;
+			}
+			String query = "update customer set emailvisibility='"+vis+"' where username='"+username+"'";
+			Statement stmt = InputOutput.newStatement(m_con);
+			InputOutput.execUpdate(stmt, query);
+			InputOutput.closeStatement(stmt);
+			System.out.println(notification);
+			InputOutput.threadsleep(3000);
+		}
+	}
+}

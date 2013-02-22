@@ -1,0 +1,166 @@
+import java.io.*;
+
+import com.sleepycat.db.*;
+import java.util.regex.Pattern;
+
+
+
+
+public class io
+{
+	
+
+	//START A DB AND POPULATE
+	public static Database init(String filename){
+		
+		deleteFile("ratingsdb");// Clear previous DB
+		
+		PrintStream cleaner = io.writer("linearanswers.txt", false);//"Start a fresh file"
+		cleaner.print("");
+		cleaner.close();
+		
+		long starttime, performance; //For measuring performance
+		System.out.print("Parsing... ");
+		starttime = System.currentTimeMillis();
+		
+		// Database configuration
+		DatabaseConfig dbConfig = new DatabaseConfig();
+		dbConfig.setType(DatabaseType.BTREE);
+		dbConfig.setAllowCreate(true);
+		dbConfig.setUnsortedDuplicates(true);
+		try{
+			// Database
+			Database std = new Database("ratingsdb", null, dbConfig);
+
+			//Ask for a reader
+			BufferedReader dbreader = reader(filename);
+
+			// Populate
+			String line;
+			while((line = dbreader.readLine()) != null)
+			{
+				line = line.trim();
+				if (line.equals("")) continue;
+				String[][] parsed = parseLine(line);
+				for(String[] row : parsed){
+					std.put(null, new DatabaseEntry(row[0].getBytes()), new DatabaseEntry(row[1].getBytes()));
+				}
+			}
+			
+			performance = System.currentTimeMillis() - starttime;
+			System.out.println(" Complete! " + performance + "ms");
+			dbreader.close();
+			return std;
+		}catch(Exception e){
+			
+			System.out.println("Parse ERROR");
+		}
+		return null;
+	}
+
+	//READS FROM A FILE
+	//PASSED IN: Filename to read from
+	//FUNCTION: Reads from a file
+	//RETURNS: BufferedReader object (essentially use .readLine())
+	public static BufferedReader reader(String filename){
+		try{
+			File aFile = new File(filename);
+			FileInputStream inputStream = new FileInputStream(aFile);
+			InputStreamReader aReader = new InputStreamReader(inputStream);
+			BufferedReader aBufferedReader = new BufferedReader(aReader);
+			return aBufferedReader;
+		}catch(Exception e){
+			System.out.println("CREATION OF READ BUFFERED FAILED");
+		}
+		return null;
+	}
+	
+	//WRITES TO A FILE
+	//PASSED IN: Filename to save to
+	//FUNCTION: Writes to the file, if the file already exists, it will write to the end
+	//RETURNS: PrintStream object (essentially use .print() or .println() to write to a file)
+	public static PrintStream writer(String filename, Boolean clear){
+		try{
+			File bFile = new File(filename);
+			FileOutputStream outputStream = new FileOutputStream(bFile, clear);
+			PrintStream aPrintStream = new PrintStream(outputStream);
+			return aPrintStream;
+		}catch(Exception e){
+			System.out.println("CREATION OF PRINTSTREAM FAILED");
+		}
+		return null;
+	}
+	
+	//DELETES A FILE
+	//PASSED IN: Filename to delete
+	//FUNCTION: Deletes the file
+	//RETURNS: Nothing
+	public static void deleteFile(String filename){
+		File file = new File(filename);
+		try{
+		file.delete();
+		}catch(Exception e){
+			System.out.println("FILE DOES NO EXIST");
+		}
+	}
+
+	/*
+	 *  Method parses a string according to the spec of assignment 4
+	 *  Passed: a single line of the data file as a String
+	 *  Returns: an array with as many elements as there are ratings for the song in the line,
+	 *  		each element is a String[2], where the first is a comma separated "<songID>,<username>"
+	 *  		and the second is "<rating>", so that each such pair is ready for key,data into bekeley db
+	 *  
+	 */
+	public static String[][] parseLine(String dataLine) {
+		//clean the line and remove the curly braces
+		int len = dataLine.length();
+		String clean = dataLine.trim().substring(1, len - 1);
+		//get the song id
+		int idStart = clean.indexOf("[") + 1;
+		int idEnd = clean.indexOf("]", idStart);
+		String id = clean.substring(idStart, idEnd).trim();
+		//ignore the song title and artist
+		int titleEnd = clean.indexOf("]", idEnd + 1);
+		int artistEnd = clean.indexOf("]", titleEnd + 1);
+		//isolate the username,rating pairs
+		int rateStart = clean.indexOf("[", artistEnd + 1) + 1;
+		int rateEnd = clean.indexOf("]", rateStart);
+		String[] rate = clean.substring(rateStart, rateEnd).split(Pattern.quote(")"));
+		//prepare the Nx2 array to be loaded with key,data pairs
+		int numberRatings = rate.length;
+		String[][] pairs = new String[numberRatings][2];
+		//load the return array
+		int k = 0;
+		for (String val : rate) {
+			int start = val.indexOf("(") + 1;
+			String[] pair = val.substring(start).split(Pattern.quote(","));
+			pairs[k][0] = id + "," + pair[0].trim();
+			pairs[k][1] = pair[1].trim(); 
+			k = k+1;
+		}
+
+		return pairs;
+	}
+
+	//////////////
+	//DEBUG CODE//
+	//////////////
+
+	public static void debugread(Database std){
+		try{
+			Cursor cursor = std.openCursor(null, null);
+			DatabaseEntry key2 = new DatabaseEntry();
+			DatabaseEntry data2 = new DatabaseEntry();
+
+			while(cursor.getNext(key2, data2, LockMode.DEFAULT) == OperationStatus.SUCCESS){
+				System.out.println(new String(key2.getData()) + new String(data2.getData()));
+				key2.setData(null);
+				data2.setData(null);
+			}
+		}catch(Exception e){
+			System.out.println("ERROR IN DEBUG: debugread(Database std)");
+		}
+	}
+
+}

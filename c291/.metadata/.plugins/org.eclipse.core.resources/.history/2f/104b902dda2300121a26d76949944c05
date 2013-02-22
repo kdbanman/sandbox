@@ -1,0 +1,81 @@
+package admin;
+
+import java.io.*;
+import java.util.*;
+
+public class InputOutput {
+static String temp;
+	
+	public static String read(){
+	InputStreamReader reader = new InputStreamReader(System.in);
+	BufferedReader bufferedreader = new BufferedReader(reader);
+	
+	try{
+		temp = bufferedreader.readLine();
+		}catch (Exception io){
+		System.out.println("Error: Cannot read input");
+		}
+	return temp;
+	}
+	
+	public static Vector<String> userlist(){
+		/*
+		 * Implement SQL code here
+		 */
+		Vector<String> temp = new Vector<String>();
+		temp.add("Jacky");
+		temp.add("Kirby");
+		return temp;
+	}
+	
+	public static void clearscreen(){
+		System.out.print("\033[H\033[2J");
+	}
+	
+	public static void threadsleep(int ms){
+		try{
+			Thread.sleep(ms);
+		}catch(Exception e){
+			System.out.println("thread sleep failed");
+		}
+	}
+	
+	public static void invalidcom(){
+		System.out.println("WARNING!!! - Command Invalid");
+		InputOutput.threadsleep(4000);
+		InputOutput.clearscreen();
+	}
+	
+	public static void vectorPrint(Vector<String> a){
+		for(int i = 0; i < a.size(); i++){
+			System.out.println("    " + a.elementAt(i));
+		} 
+	}
+	
+	public static void vectorPrintNum(Vector<String> a){
+		for(int i = 0; i < a.size(); i++){
+			System.out.println("Row " + (i+1) + ": " + a.elementAt(i));
+		} 
+	}
+	
+	public static void splashScreen(){
+		System.out.print("Loading: |");
+		for(int spin = 0; spin < 30; spin++){
+			System.out.print("\b");
+			System.out.print("|");
+			InputOutput.threadsleep(30);
+			System.out.print("\b");
+			System.out.print("/");
+			InputOutput.threadsleep(30);
+			System.out.print("\b");
+			System.out.print("-");
+			InputOutput.threadsleep(30);
+			System.out.print("\b");
+			System.out.print("\\");
+			InputOutput.threadsleep(30);
+			System.out.print("*");
+		}
+		System.out.print("\b Complete!!!\n");
+		threadsleep(1000);
+	}
+}

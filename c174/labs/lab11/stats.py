@@ -1,0 +1,200 @@
+'''Computes basic stats from samples.'''
+
+def mean(values):
+    '''Return the arithmetic mean of the list of values; i.e. the 
+    sum of all the values divided by the total number of values.'''
+    
+    if len(values) == 0:
+        raise Exception("mean of empty list is undefined")
+    
+    return sum(values)/len(values)
+
+def median(values):
+    '''Returns the median value. In a sorted list of odd length, the 
+    median divides the list evenly in two halves (less than and 
+    higher than the median). If the list has even length, the median is
+    the mean of the two elements in the "middle".'''
+
+    if len(values) == 0:
+        raise Exception("median of empty list is undefined")
+    
+    #copy the values so we don't change the original list
+    copy = values[:]
+    copy.sort()
+    if len(copy) % 2 == 0:
+        mid = len(copy) / 2
+        return (copy[mid] + copy[mid-1])/2.0
+    else:
+        mid = int(len(copy) / 2)
+        return copy[mid]
+
+  
+def mode(values):
+    '''Return a list containing the mode of the list of values. The 
+    mode is list with the most frequently occurring values in the sample.'''
+
+    if len(values) == 0:
+        raise Exception("mode of empty list is undefined")
+
+    #start with a dictionary of frequencies
+    freq = {}
+    for element in values:
+        freq[element] = freq.get(element,0) + 1
+    
+    answer = [] #several elements may be in the answer
+    highest = 0 #keeps the highest frequency
+    for k, v in freq.items():
+        if v > highest:  # new highest frequency
+            highest = v
+            answer = [k]
+        elif v == highest: #another element with high frequency
+            answer.append(k)
+    return answer
+
+def quartiles(l):
+    if len(l) < 3:
+        raise Exception('quartiles are only defined for lists of 3 or more elements')
+    lSort = l[:]
+    lSort.sort()
+    
+    if len(lSort) == 3:
+        first = lSort[0]
+        second = lSort[1]
+        third = lSort[2]
+        
+    if len(lSort) > 3:
+        qWidth = len(lSort)/4    
+        
+        first = lSort[int(qWidth)]
+        second = lSort[int(2*qWidth)]
+        third = lSort[int(3*qWidth)]
+            
+    return [first, second, third]
+
+def histogram(values, low, high, bins):
+    if bins > len(values):
+        print('warning: more bins than there are values in the dataset')
+    
+    if high <= low:
+        raise Exception('range max must be greater than range min')
+    
+    if not(type(bins) == int):
+        raise Exception('number of bins must be integer')
+    
+    bWidth = (high - low)/bins
+    
+    V = values[:]
+    V.sort()
+    
+    buckets = []
+    i = 0
+    b = 1
+    for value in V:
+        if value >= low and value <= high:
+            intMax = low + b*bWidth
+            intMin = low + bWidth*(b-1)
+            if (value < intMax and value >= intMin) or value == high:
+                i += 1
+            if value >= intMax and not value == high:
+                buckets.append(i)
+                i = 1
+                b += 1
+            
+    buckets.append(i)
+    
+    return buckets
+
+'''
+These are the unit tests!
+'''
+if __name__ == "__main__":
+    failed = 0
+    l1 = [1]*10
+    l2 = [0, 2, 1]
+    l3 = [0, 1, 0, 3, 2, 4, 1]
+    l11 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    
+    if mean(l1) != 1:
+        print("mean(l1) != 1 failed")
+        failed = failed + 1
+
+    if mean(l11) != 5.0:
+        print("mean(l11) != 5.0 failed")
+        failed = failed + 1
+    
+    if median(l2) != 1:
+        print("median(l2) != 1 failed!")
+        failed = failed + 1
+    
+    if median(l11) != 5:
+        print("median(l11) != 5 failed")
+        failed = failed + 1
+    
+    if mode(l3) != [0, 1]:
+        print("mode(l3) != [0, 1] failed")
+        failed = failed + 1
+    
+    if mode(l11) != l11:
+        print("mode(l11) != l11 failed")
+        failed = failed + 1
+
+    try:
+        if mean([]) != None:
+            print("mean([]) failed! ")
+            failed = failed + 1
+        if median([]) != None:
+            print("median([]) failed! ")
+            failed = failed + 1
+        if mode([]) != None:
+            print("mode([]) failed! ")
+            failed = failed + 1
+    except:
+        pass #pass means "do nothing"
+
+#Unit Tests added by Kirby
+    short1 = []
+    short2 = [1]
+    short3 = [1,2]
+    minim = [3,4,3]
+    test1 = [1,1,9,3]
+    test2 = [3,4,5,6,8,9,10,10,9,8,6,5,4,3]
+    
+    histTest = [3,3,4,4,5,5,6,6,6,7,7,8,9,9,10]
+    
+    try:
+        print(quartiles(short1))
+        failed += 1
+    except:
+        pass
+    try:
+        print(quartiles(short2))
+        failed += 1
+    except:
+        pass    
+    try:
+        print(quartiles(short3))
+        failed += 1
+    except:
+        pass
+    if not quartiles(minim) == [3,3,4]:
+        failed += 1
+    if not quartiles(test1) == [1,3,9]:
+        failed += 1
+        
+
+    #
+    # SUMMARY OF ALL TESTS
+    #
+    if failed > 0:
+        print(failed, "tests failed!")
+    else:
+        print("passed all tests!")
+    test2.sort()
+    print('\nquartiles of list ' + str(minim) + ' are:')
+    print(quartiles(minim))
+    print('\nquartiles of list ' + str(test1) + ' are:')
+    print(quartiles(test1))
+    print('\nquartiles of list ' + str(test2) + ' are:')
+    print(quartiles(test2))
+    print('\nhistogram(t,0,10,5) is:')
+    print(histogram(histTest,0,10,5))

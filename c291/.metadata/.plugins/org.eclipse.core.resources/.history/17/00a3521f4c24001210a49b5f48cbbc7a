@@ -1,0 +1,50 @@
+package admin;
+
+import java.sql.*;
+import java.util.Vector;
+
+public class three {
+	public static void menu(Statement stmt) throws SQLException{
+		int back = 0;
+		while(back == 0){
+		
+			String query = "select mid, title, quantity from media, movie where id=mid";
+			ResultSet rs = stmt.executeQuery(query);
+			Vector<String> movies = new Vector<String>();
+			Vector<Integer> validIds = new Vector<Integer>();
+			while (rs.next()) {
+				System.out.println("hereee");
+				validIds.add(rs.getInt("mid"));
+				String mid = rs.getString("mid");
+				while (mid.length() < 21) {
+					mid = mid + " ";
+				}
+				String title = rs.getString("title");
+				while (title.length() < 21) {
+					title = title + " ";
+				}
+				String quantity = rs.getString("quantity");
+				String printRow = mid + title + quantity;
+				movies.add(printRow);
+			}
+			
+			
+			
+			InputOutput.clearscreen();
+			System.out.println("*******************************");
+			System.out.println("*   Adjust movie quantities   *");
+			System.out.println("*******************************\n");
+			System.out.println("    MOVIE ID            MOVIE TITLE         QUANTITY AVAILABLE\n");
+			InputOutput.vectorPrint(movies);
+			System.out.println("Choose movie to update quantity available for rent: ");
+			int movieChoice = InputOutput.cleanCommand(InputOutput.read());
+			if (!validIds.contains(movieChoice)) {
+				InputOutput.invalidcom();
+				InputOutput.threadsleep(3000);
+			}
+
+
+		}
+	}
+}
+

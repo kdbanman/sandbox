@@ -1,0 +1,1 @@
+select title, username, movieid from Rent, Media where movieid = id and rentmode = 'S' and (sysdate - since) > 7

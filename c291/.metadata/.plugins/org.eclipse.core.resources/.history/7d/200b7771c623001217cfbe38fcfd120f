@@ -1,0 +1,128 @@
+import java.util.Vector;
+
+
+public class three {
+
+	public static void menu(String username){
+		Vector<String> all_media = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 */
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("******************");
+			System.out.println("* Discover Media *");
+			System.out.println("******************");
+			InputOutput.vectorPrint(all_media);
+			System.out.print("1. Purchase\n2. Rent\n3. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				purchase(all_media, username);
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				rent(username);
+				InputOutput.clearscreen();
+				break;
+			case 3:
+				back = 1;
+				InputOutput.clearscreen();
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+		}
+	}
+	private static void purchase(Vector<String> all_media, String username){
+		boolean validid = false;
+		boolean credit = false;
+
+		Vector<String> media_id_list = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up media id
+		 */
+		int answered = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("************");
+			System.out.println("* Purchase *");
+			System.out.println("************");
+			InputOutput.vectorPrint(all_media);
+			System.out.print("Media ID: ");
+			String mediaid = InputOutput.read();
+
+			for(int i = 0; i < media_id_list.size(); i++){
+				if(mediaid.equals(media_id_list))
+					validid = true;
+			}
+			//Check credit? For now assuming enough
+			credit = true;
+
+			if(validid == true && credit == true){
+				System.out.println("Purchase successful!");
+				answered = 1;
+			}
+			if(validid == false)
+				System.out.println("Media ID entered is invalid");
+			else if(credit == false)
+				System.out.println("You do not have enough credits");
+
+			InputOutput.threadsleep(4000);
+		}
+	}
+
+	private static void rent(String username){
+		boolean validid = false;
+		boolean credit = false;
+		boolean copies = false;
+
+		Vector<String> all_movies = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up all the movies
+		 */
+		Vector<String> movie_id = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up all the movie id
+		 */
+		int answered = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("********");
+			System.out.println("* Rent *");
+			System.out.println("********");
+			InputOutput.vectorPrint(all_movies);
+			System.out.print("Media ID: ");
+			String mediaid = InputOutput.read();
+
+			for(int i = 0; i < movie_id.size(); i++){
+				if(mediaid.equals(movie_id))
+					validid = true;
+			}
+			//Check credit? For now assuming enough
+			credit = true;
+			
+			//Check copies? For now assuming enough
+			copies = true;
+
+			if(validid == true && credit == true && copies == true){
+				System.out.println("Rent successful!");
+				answered = 1;
+			}
+			if(validid == false)
+				System.out.println("Media ID entered is invalid");
+			else if(credit == false)
+				System.out.println("You do not have enough credits");
+			else if(copies == false)
+				System.out.println("There are not enough copies");
+
+			InputOutput.threadsleep(4000);
+		}
+	}
+}

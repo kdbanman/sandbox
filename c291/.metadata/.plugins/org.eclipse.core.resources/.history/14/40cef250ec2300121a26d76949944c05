@@ -1,0 +1,47 @@
+package admin;
+
+import java.sql.*;
+import java.util.Vector;
+
+public class two {
+	public static void menu(Statement stmt){
+		int back = 0;
+		while(back == 0){
+			prettyTop();
+			int threshold = InputOutput.cleanCommand(InputOutput.read());
+			System.out.print("Amount of movies? ");
+			int amount = InputOutput.cleanCommand(InputOutput.read());
+			if (threshold >= 0 && threshold <= 10 && amount >= 1) {
+
+				String query = "select movieid, title, rating from media, rate where id=movieid and rating>"+(threshold)+" order by rating desc";
+				ResultSet rs = stmt.executeQuery(query);
+				int rowCount = rs.getFetchSize();
+				
+				System.out.print("Press enter to return to home screen." + (rowCount));
+				back = 1;
+				break;
+				
+			} else {
+				if (threshold < 0 || threshold > 10) {
+					System.out.println("ERROR!!  Threshold must be be integer 0-10");
+				} else if (amount < 1) {
+					System.out.println("ERROR!!  Amount must be integer > 0");
+				} else if (insuffRows) {
+					System.out.println("ERROR!!  Threshold too high for amount requested");
+				}
+				InputOutput.threadsleep(3000);
+				break;
+			}
+
+
+		}
+	}
+	
+	private static void prettyTop() {
+		InputOutput.clearscreen();
+		System.out.println("******************************");
+		System.out.println("*      View top movies       *");
+		System.out.println("******************************\n");
+		System.out.print("Rating threshold? (0-10) ");
+	}
+}

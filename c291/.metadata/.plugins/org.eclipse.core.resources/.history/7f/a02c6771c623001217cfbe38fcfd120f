@@ -1,0 +1,103 @@
+import java.util.*;
+
+
+public class two {
+
+	public static void menu(String username){
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("*********************");
+			System.out.println("* View/Edit friends *");
+			System.out.println("*********************");
+			System.out.print("1. View/Remove friends\n2. View/Add suggested friends\n3. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				removeFriend(username);
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				addSuggestedFriend(username);
+				InputOutput.clearscreen();
+				break;
+			case 3:
+				back = 1;
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+		}
+	}
+	private static void removeFriend(String username){
+		Vector<String> friends = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * Load up the user's friends
+		 */
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("***********************");
+			System.out.println("* View/Remove friends *");
+			System.out.println("***********************");
+			InputOutput.vectorPrint(friends);
+			System.out.print("1. Remove friend\n2. Back\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				/*
+				 * Implement SQL code here
+				 * Don't worry about this one yet
+				 */
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				back = 1;
+				InputOutput.clearscreen();
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+		}
+	}
+	private static void addSuggestedFriend(String username){
+		Vector<String> suggested_fd = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * Load it with the list of suggested friends
+		 */
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("********************");
+			System.out.println("* View/Add friends *");
+			System.out.println("********************");
+			InputOutput.vectorPrint(suggested_fd);
+			System.out.print("1. Add friend\n2. Back\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				/*
+				 * Implement SQL code here
+				 */
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				back = 1;
+				InputOutput.clearscreen();
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+		}
+	}
+}

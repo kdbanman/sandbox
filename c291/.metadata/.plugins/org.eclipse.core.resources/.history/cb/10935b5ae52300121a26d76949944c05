@@ -1,0 +1,35 @@
+package admin;
+
+import java.sql.Statement;
+import java.util.Vector;
+
+public class three {
+	public static void menu(Statement stmt){
+		int back = 0;
+		while(back == 0){
+			Vector<String> overdue = new Vector<String>();
+			//populate overdue
+			InputOutput.clearscreen();
+			System.out.println("******************************");
+			System.out.println("*   Update user rent modes   *");
+			System.out.println("******************************\n");
+			System.out.println("Overdue short term rentals: ");
+			InputOutput.vectorPrint(overdue);
+			System.out.print("1. Update overdue short term rentals to long term rentals\n2. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				// TODO
+			case 2:
+				back = 1;
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+
+		}
+	}
+}

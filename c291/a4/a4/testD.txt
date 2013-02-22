@@ -1,0 +1,6 @@
+{[1],[s1 1973],[James Blunt],[(Jacky,10),(Matt,10),(Kirby,10)]}
+{[2],[s2 YEAH],[James Blunt],[(Jacky,9),(Matt,10),(Kirby,10)]}
+{[3],[s3 NOOO],[James Blunt],[(Jacky,1),(Matt,2),(Kirby,1)]}
+{[4],[s4 CLOSE],[James Blunt],[(Jacky,8),(Matt,9),(Kirby,9)]}
+{[5],[s5 HMMMM],[James Blunt], [(Jacky,9),(Matt,10),(Kirby,10)]}
+{[6],[s6 KLOL],[James Blunt], [(Jacky,5),(Matt,10),(Kirby,5)]}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.sleepycat.db.LockMode"/>
+<fullyQualifiedTypeName name="com.sleepycat.db.OperationStatus"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="java.lang.Math"/>
+<fullyQualifiedTypeName name="com.sleepycat.db.Database"/>
+<fullyQualifiedTypeName name="com.sleepycat.db.DatabaseConfig"/>
+<fullyQualifiedTypeName name="com.sleepycat.db.Cursor"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+</qualifiedTypeNameHistroy>

@@ -1,0 +1,12 @@
+{
+  "/Users/kirbybanman/c291/a3/src": {
+    "location": "/Users/kirbybanman/c291/a3/src",
+    "status": "UNRESOLVED",
+    "error": "No class path info available for \u0027/Users/kirbybanman/c291/a3/src\u0027. Skipped."
+  },
+  "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar": {
+    "coordinate": "jre:jre:zip:call:1.0.0",
+    "location": "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar",
+    "status": "RESOLVED"
+  }
+}

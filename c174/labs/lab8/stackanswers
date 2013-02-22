@@ -1,0 +1,19 @@
+<module>(): lab8.1.py, line 17	# within the script at line 17, function h() was called with
+				globals x == 1, y == 2
+				
+				
+h(): lab8.1.py, line 12		# within function h() at line 12, function g() was called with
+				locals x == 1, y == 5, z == 3, w == 8
+				
+				@line 13, v == 8100
+
+g(): lab8.1.py, line 7		# within function g() at line 7, function f() was called with
+				locals x == 1, y == 8, z == 9
+
+				@line 8, prod == 90
+				
+				
+f(): lab8.1.py, line 3		# this is the last line before the interpreter starts to
+				# trace backwards through the stack, where 
+				locals x == 10, y == 9
+

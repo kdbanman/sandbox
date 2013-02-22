@@ -1,0 +1,183 @@
+package user;
+
+import io.InputOutput;
+
+import java.util.*;
+import java.sql.*;
+
+
+public class two {
+
+	public static void menu(String username, Connection m_con){
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("*********************");
+			System.out.println("* View/Edit friends *");
+			System.out.println("*********************");
+			System.out.print("1. View/Remove friends\n2. View/Add suggested friends\n3. Home\nChoice: ");
+			int command = InputOutput.cleanCommand(InputOutput.read());
+			switch (command){
+			case 1:
+				removeFriend(username,m_con);
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				addSuggestedFriend(username,m_con);
+				InputOutput.clearscreen();
+				break;
+			case 3:
+				back = 1;
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+		}
+	}
+	private static void removeFriend(String username, Connection m_con) throws SQLException{
+		Vector<String> friends = new Vector<String>();
+		String query = "(select user2 username from friend where user1 ='"+username+"') union (select user1 username from friend where user2 = '"+username+"')";
+		Statement stmt = InputOutput.newStatement(m_con);
+		ResultSet rs = InputOutput.execQuery(stmt, query);
+		while (rs.next()) {
+			friends.add(rs.getString("username").trim());
+		}
+		InputOutput.closeStatement(stmt);
+		
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("***********************");
+			System.out.println("* View/Remove friends *");
+			System.out.println("***********************\n");
+			InputOutput.vectorPrint(friends);
+			System.out.print("1. Remove friend\n2. Back\nChoice: ");
+			
+			int command = InputOutput.cleanCommand(InputOutput.read());
+			
+			switch (command){
+			case 1:
+				removeFriend(username,friends,m_con);
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				back = 1;
+				InputOutput.clearscreen();
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+		}
+	}
+	private static void addSuggestedFriend(String username, Connection m_con) throws SQLException{
+		Vector<String> suggested_fd = new Vector<String>();
+		String query = "select username " +
+						"from Customer c " +
+						"where exists ( " +
+								"select * " +
+								"from Friend f1 " +
+								"where (f1.user1 != 'c1' or f1.user2 != 'c1') " +
+								"and (f1.user1 = c.username or f1.user2 = c.username) " +
+								"and not exists ( " +
+										"select * " +
+										"from Friend f2 " +
+										"where (f2.user1 = 'c1' or f2.user2 = 'c1') " +
+										"and (f2.user1 = f1.user1 " +
+										"or f2.user1 = f1.user2 " +
+										"or f2.user2 = f1.user1 " +
+										"or f2.user2 = f1.user2) " +
+										") " +
+								")";
+		Statement stmt = InputOutput.newStatement(m_con);
+		ResultSet rs = InputOutput.execQuery(stmt, query);
+		while (rs.next()) {
+			//TODO
+		}
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("********************");
+			System.out.println("* View/Add friends *");
+			System.out.println("********************");
+			InputOutput.vectorPrint(suggested_fd);
+			System.out.println("********************");
+			System.out.print("1. Add friend\n2. Back\nChoice: ");
+			
+			int command = InputOutput.cleanCommand(InputOutput.read());
+			
+			switch (command){
+			case 1:
+				addFriend(username, suggested_fd,m_con);
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				back = 1;
+				InputOutput.clearscreen();
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+		}
+	}
+	private static void addFriend(String username, Vector<String> suggested_fd, Connection m_con){
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("**************");
+			System.out.println("* Add friend *");
+			System.out.println("**************");
+			InputOutput.vectorPrint(suggested_fd);
+			System.out.println("**************");
+			System.out.print("Number: ");
+			
+			int command = InputOutput.cleanCommand(InputOutput.read());
+			
+			if(command >= (suggested_fd.size()+1)){
+				InputOutput.invalidcom();
+			}
+			else
+			{
+				String add = suggested_fd.elementAt(command - 1);
+				/*
+				 * Implement SQL command to add "add" to their friend list
+				 */
+				System.out.println("Friend added!");
+				InputOutput.threadsleep(4000);
+				back = 1;
+			}
+		}
+	}
+	
+	private static void removeFriend(String username, Vector<String> friends, Connection m_con){
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("*****************");
+			System.out.println("* Remove friend *");
+			System.out.println("*****************\n");
+			InputOutput.vectorPrint(friends);
+			System.out.print("Username to remove from friends: ");
+			
+			String friend = InputOutput.read();
+			
+			if(!friends.contains(friend)){
+				InputOutput.invalidcom();
+			}
+			else
+			{
+				String query = "delete from friend where user1='"+username+"' and user2='"+friend+"' or user1='"+friend+"' and user2='"+username+"'";
+				Statement stmt = InputOutput.newStatement(m_con);
+				InputOutput.execUpdate(stmt, query);
+				InputOutput.closeStatement(stmt);
+				System.out.println("Friend removed!");
+				InputOutput.threadsleep(4000);
+				back = 1;
+			}
+		}
+	}
+}

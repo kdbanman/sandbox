@@ -1,0 +1,173 @@
+package user;
+
+import io.InputOutput;
+
+import java.util.Vector;
+import java.sql.*;
+
+
+public class three {
+
+	public static void menu(String username, Statement stmt){
+		Vector<String> all_media = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 */
+		// TEST CASES *****************************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		all_media.add("mid1");
+		all_media.add("mid2");
+		all_media.add("mid3");
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("******************");
+			System.out.println("* Discover Media *");
+			System.out.println("******************");
+			InputOutput.vectorPrintNoNumbering(all_media);
+			System.out.println("******************");
+			System.out.print("1. Purchase\n2. Rent\n3. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			int intcommand;
+			try{
+				intcommand = Integer.parseInt(command);
+			}catch(Exception e){
+				intcommand = 45;
+			}
+
+			switch (intcommand){
+				case 1:
+					purchase(all_media, username,stmt);
+					InputOutput.clearscreen();
+					break;
+				case 2:
+					rent(username,stmt);
+					InputOutput.clearscreen();
+					break;
+				case 3:
+					back = 1;
+					InputOutput.clearscreen();
+					break;
+				default:
+					InputOutput.invalidcom();
+					break;
+			}
+		}
+	}
+	private static void purchase(Vector<String> all_media, String username, Statement stmt){
+		boolean credit = false;
+		boolean valid = false;
+		int answered = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("************");
+			System.out.println("* Purchase *");
+			System.out.println("************");
+			InputOutput.vectorPrint(all_media);
+			System.out.println("************");
+			System.out.print("Media ID: ");
+			String mediaid = InputOutput.read();
+
+			int intcommand;
+			try{
+				intcommand = Integer.parseInt(mediaid);
+				valid = true;
+			}catch(Exception e){
+				intcommand = -1;
+			}
+
+			if(intcommand >= (all_media.size()+1)){
+				InputOutput.invalidcom();
+			}
+			else
+			{
+				//Check credit? For now assuming enough
+				credit = true;
+
+				if(valid == true && credit == true && intcommand > 0){
+					System.out.println("Purchase successful!");
+					answered = 1;
+				}
+				else
+					InputOutput.invalidcom();
+				if(valid == true && credit == false)
+					System.out.println("You do not have enough credits");
+
+				InputOutput.threadsleep(4000);
+			}
+		}
+	}
+
+	private static void rent(String username, Statement stmt){
+		boolean credit = false;
+		boolean copies = false;
+		boolean valid = false;
+
+		Vector<String> all_movies = new Vector<String>();
+		String select = "select title from movie, media where movie.mid = media.id";//This shows all movies
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up all the movies
+		 */
+		// TEST CASES *****************************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		all_movies.add("movrent1");
+		all_movies.add("movrent2");
+		all_movies.add("movrent3");
+		int answered = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("********");
+			System.out.println("* Rent *");
+			System.out.println("********");
+			InputOutput.vectorPrint(all_movies);
+			System.out.println("********");
+			System.out.print("Movie: ");
+			String mediaid = InputOutput.read();
+
+			int intcommand;
+			try{
+				intcommand = Integer.parseInt(mediaid);
+				valid = true;
+			}catch(Exception e){
+				intcommand = -1;
+			}
+
+			if(intcommand >= (all_movies.size()+1)){
+				InputOutput.invalidcom();
+				break;
+			}
+			String moviecheck = all_movies.elementAt(intcommand-1);//This is the name of the movie that the user wants
+			String select3 = "select price from media where title = '"+moviecheck+"'"; //This checks the price
+			int movieprice = 0; // Store the price from sql into this
+			String select2 = "select credit from customer where username = '" + username + "'";  //This checks the user's credit
+			int usercredit = 0;; // Store the credit from sql into this
+			
+			if(usercredit - movieprice >= 0)
+				credit = true;
+			
+			//Check copies? For now assuming enough
+			copies = true;
+
+			if(valid == true && credit == true && copies == true && intcommand > 0 && intcommand <= all_movies.size()){
+				/*
+				 * Implement SQL code for rent
+				 */
+				System.out.println("Rent successful!");
+				InputOutput.threadsleep(4000);
+				answered = 1;
+			}
+			else if(credit == false){
+				System.out.println("You do not have enough credits");
+				InputOutput.threadsleep(4000);
+			}
+
+			else if(copies == false){
+				System.out.println("There are not enough copies");
+				InputOutput.threadsleep(4000);
+			}
+			else
+				InputOutput.invalidcom();
+
+		}
+	}
+}

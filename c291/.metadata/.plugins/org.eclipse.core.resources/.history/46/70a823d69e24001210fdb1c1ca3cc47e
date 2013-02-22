@@ -1,0 +1,135 @@
+package io;
+
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+
+public class InputOutput {
+static String temp;
+	
+	public static String read(){
+	InputStreamReader reader = new InputStreamReader(System.in);
+	BufferedReader bufferedreader = new BufferedReader(reader);
+	
+	try{
+		temp = bufferedreader.readLine();
+		}catch (Exception io){
+		System.out.println("Error: Cannot read input");
+		}
+	return temp;
+	}
+	
+	public static Vector<String> userlist(Connection m_con) throws SQLException{
+
+		Vector<String> temp = new Vector<String>();
+		String query = "select username from customer";
+		Statement stmt = InputOutput.newStatement(m_con);
+		ResultSet rs = InputOutput.execQuery(stmt, query);
+		while (rs.next()) {
+			temp.add(rs.getString("username"));
+		}
+		return temp;
+	}
+	
+	public static void clearscreen(){
+		System.out.print("\033[H\033[2J");
+	}
+	
+	public static void threadsleep(int ms){
+		try{
+			Thread.sleep(ms);
+		}catch(Exception e){
+			System.out.println("thread sleep failed");
+		}
+	}
+	
+	public static void invalidcom(){
+		System.out.println("WARNING!!! - Command Invalid");
+		InputOutput.threadsleep(3000);
+		InputOutput.clearscreen();
+	}
+	
+	public static void vectorPrint(Vector<String> a){
+		
+		if (a.size() == 0) System.out.println("\n(No values to display)\n");
+		
+		for(int i = 0; i < a.size(); i++){
+			System.out.println("    " + a.elementAt(i));
+		} 
+	}
+	
+	public static int cleanCommand(String command) {
+		int intCommand;
+		if (command.equals("")) intCommand = -1;
+		try{
+			intCommand = Integer.parseInt(command);
+		}catch(Exception e){
+			intCommand = -1;
+		}
+		return intCommand;
+	}
+	
+	public static Statement newStatement(Connection m_con) {
+		Statement stmt = null;
+		try {
+			stmt = m_con.createStatement();
+		} catch (SQLException e) {
+			System.out.println("Couldn't generate statement from connection. Statement is null.");
+			e.printStackTrace();
+		}
+		return stmt;
+	}
+	
+	public static void closeStatement(Statement stmt) {
+		try {
+			stmt.close();
+		} catch (SQLException e) {
+			System.out.println("Couldn't close statement.");
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static ResultSet execQuery(Statement stmt, String query) {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(query);
+		} catch (SQLException e) {
+			System.out.println("Couldn't execute query. Result set is null.");
+			threadsleep(3000);
+			e.printStackTrace();
+		}
+		
+		return rs;
+	}
+	
+	public static boolean execUpdate(Statement stmt, String query) {
+		try {
+			stmt.executeUpdate(query);
+			return true;
+		} catch (SQLException e) {
+			System.out.println("Couldn't execute update.");
+			threadsleep(3000);
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public static boolean validEmail(String email){
+		boolean checkat = false;
+		boolean checkdot = false;
+		
+		for(int i = 0; i < email.length(); i++){
+			String temp = Character.toString(email.charAt(i));
+			if(checkat == false && temp.equals("@"))
+				checkat = true;
+			if(checkat == true && checkdot == false && temp.equals("."))
+				checkdot = true;
+		}
+		
+		if(checkat == true && checkdot == true)
+			return true;
+		
+		return false;
+	}
+}

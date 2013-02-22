@@ -1,0 +1,101 @@
+import java.util.*;
+
+public class Welcome {
+	static String oracleusername;
+	static String oraclepassword;
+	static String oracleserver = "gwyne.cs.ualberta.ca";
+	static String username;
+	static String password;
+	public static void main(String[] args) {
+
+		InputOutput.clearscreen();
+		System.out.println("*******************");
+		System.out.println("* Login to Oracle *");
+		System.out.println("*******************");
+		System.out.println("Oracle username: ");
+		oracleusername = InputOutput.read();
+		System.out.println("Oracle password:");
+		oraclepassword = InputOutput.read();
+		System.out.println("\nAlright, we are logging into Oracle as:\n"+oracleusername);
+		System.out.println("We will connect to the following server:\n"+oracleserver);
+		
+		InputOutput.splashScreen(); //Pause animation
+
+
+		int exit = 0;
+		while(exit == 0){
+			int login = 0;
+			InputOutput.clearscreen();
+			while(login == 0){
+				System.out.println("***********************");
+				System.out.println("* Hello! Please Login *");
+				System.out.println("***********************");
+				System.out.print("Username: ");
+				username = InputOutput.read();
+				System.out.print("Password: ");
+				password = InputOutput.read();
+
+				Vector<String> validuser = new Vector<String>();
+				validuser = InputOutput.userlist();
+				for(int i = 0; i < validuser.size(); i++){
+					if(username.equals(validuser.elementAt(i))){
+						login = 1;
+						i = validuser.size()+1;//Found valid user jump out of loop
+						InputOutput.clearscreen();
+					}
+				}
+				if(login == 0)
+				{
+					System.out.println("WARNING! - The user name and password is not correct!\nPlease try again!");
+					InputOutput.threadsleep(4000);
+					InputOutput.clearscreen();
+				}
+
+			}//After this we are logged in
+			int logout = 0;
+			while(logout == 0){
+				System.out.println("**************************");
+				System.out.println("*    Welcome to SAML!    *");
+				System.out.println("**************************");
+				System.out.println("1. View/Edit personal info\n2. View/Edit friends\n3. Discover media\n4. Owned movies\n5. Logout\n6. Exit");
+				String command = InputOutput.read();
+
+				switch (Integer.parseInt(command)){
+				case 1:
+					one.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 2:
+					two.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 3:
+					three.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 4:
+					four.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 5:
+					logout = 1;
+					System.out.println("Logout Successful!");
+					InputOutput.threadsleep(4000);
+					InputOutput.clearscreen();
+					break;
+				case 6:
+					logout = 1;
+					exit = 1;
+					InputOutput.clearscreen();
+					System.out.println("Goodbye!");
+					break;
+				default:
+					InputOutput.invalidcom();
+					break;
+
+
+				}
+			}//Welcome screen ends here
+		}//Entire Program
+	}//Main end
+}

@@ -1,0 +1,72 @@
+package admin;
+
+import java.util.*;
+import java.sql.*;
+import admin.InputOutput;
+
+public class one {
+	public static void menu(Statement stmt){
+		int back = 0;
+		while(back == 0){
+			Vector<String> overdue = null;
+			try {
+				overdue = viewOverdue(stmt);
+			}catch(Exception e){
+				System.out.println(e.getMessage());
+			}
+			//InputOutput.clearscreen();
+			System.out.println("******************************");
+			System.out.println("*   Update user rent modes   *");
+			System.out.println("******************************\n");
+			System.out.println("Overdue short term rentals: ");
+			InputOutput.vectorPrint(overdue);
+			System.out.println(overdue.firstElement());
+			System.out.print("1. Update overdue short term rentals to long term rentals\n2. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				fixOverdue(stmt);
+			case 2:
+				back = 1;
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+
+
+		}
+	}
+	
+	private static Vector<String> viewOverdue(Statement stmt) throws SQLException {
+		String query = "select Media.title, Rent.username from Rent, Media";// where Rent.movieid = Media.id";// and Rent.rentmode = 'S' and (sysdate - Rent.since) > 7;";
+		try{
+			ResultSet rs = stmt.executeQuery(query);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		
+		Vector<String> temp = new Vector<String>();
+//		while (rs.next()) {
+//			String title = rs.getString("title");
+//			while (title.length() < 21) {
+//				title = title + " ";
+//			}
+//			String user = rs.getString("username");
+//			String printRow = title + user;
+//			System.out.println(rs.getMetaData().getColumnCount());
+//			temp.add(printRow);
+//		}
+		return temp;
+	}
+	
+	private static void fixOverdue(Statement stmt) {
+		String query = "update Rent set rentmode = 'L' where rentmode = 'S' and  (sysdate - since) > 7;";
+		try {
+			stmt.executeUpdate(query);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+	}
+}

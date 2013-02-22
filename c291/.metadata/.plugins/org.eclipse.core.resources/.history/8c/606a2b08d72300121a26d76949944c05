@@ -1,0 +1,118 @@
+package admin;
+
+import admin.InputOutput;
+import admin.one;
+import admin.two;
+import admin.three;
+
+import java.sql.*;
+
+public class Welcome {
+	
+	static Connection m_con;
+	static Statement stmt;
+	static String username;
+	static String password;
+	
+	public static void main(String[] args) {
+		try {
+			String oracleusername;
+			String oraclepassword;
+			String oracleserver = "jdbc:oracle:thin:@gwynne.cs.ualberta.ca:1521:CRS";
+			
+			//Login to oracle loop
+			int oracle = 0;
+			while(oracle == 0){
+				InputOutput.clearscreen();
+				System.out.println("*******************");
+				System.out.println("* Login to Oracle *");
+				System.out.println("*******************");
+				System.out.print("Oracle username: ");
+				oracleusername = InputOutput.read();
+				System.out.print("Oracle password: ");
+				oraclepassword = InputOutput.read();
+				InputOutput.clearscreen();
+				System.out.println("\n\nAlright, we are logging into Oracle as:\n"+oracleusername);
+				System.out.println("\nWe will connect to the following server:\n"+oracleserver);
+				System.out.print("\nLoading JDBC drivers...");
+				try{
+					String  m_driverName = "oracle.jdbc.driver.OracleDriver";
+					Class.forName(m_driverName);
+				}catch(Exception e){
+					System.out.println(e.getMessage());
+				}
+				System.out.println(" OK!");
+				System.out.print("\nLogging you in...      ");
+				try{
+					m_con = DriverManager.getConnection(oracleserver, oracleusername, oraclepassword);
+					stmt = m_con.createStatement();
+					System.out.println(" OK!");
+					oracle = 1;
+				} catch(Exception e){
+					System.out.println(e.getMessage()+"\nPlease try again! We will return you to login in 5 seconds");
+					oracle = 0;
+					InputOutput.threadsleep(5000);
+				}
+				if (oracle == 1) {
+					System.out.println("\nStarting SAML Admin...");
+				}
+			}
+			
+			int exit = 0;
+			while(exit == 0){
+	
+				InputOutput.clearscreen();
+				System.out.println("********************************");
+				System.out.println("*    Welcome to SAML Admin!    *");
+				System.out.println("********************************");
+				System.out.println("1. Update user rent modes\n2. View top movies\n3. Adjust movie quantities\n4. Exit");
+				String command = InputOutput.read();
+	
+				switch (Integer.parseInt(command)){
+				case 1:
+					one.menu(stmt);
+					InputOutput.clearscreen();
+					break;
+				case 2:
+					two.menu(stmt);
+					InputOutput.clearscreen();
+					break;
+				case 3:
+					three.menu(stmt);
+					InputOutput.clearscreen();
+					break;
+				case 4:
+					exit = 1;
+					InputOutput.clearscreen();
+					System.out.print("\nClosing connection to Oracle...\n");
+					try {
+						stmt.close();
+						m_con.close();
+						System.out.println("Oracle connections successfully closed.\n");
+						InputOutput.threadsleep(3000);
+					}catch(Exception e){
+						System.out.println("We could not close your connection to oracle! Try again later or contact administrator");
+						InputOutput.threadsleep(3000);
+						break;
+					}
+				default:
+					InputOutput.invalidcom();
+					InputOutput.threadsleep(3000);
+					break;
+				}
+			}
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			try {
+				stmt.close();
+				m_con.close();
+				System.out.println("Oracle connections closed.");
+			}catch(Exception e2){
+				System.out.println(e2.getMessage());
+				System.out.println("We could not close your connection to oracle! Try again later or contact administrator");
+				System.out.println("Goodbye!");
+			}
+		}
+	}
+
+}

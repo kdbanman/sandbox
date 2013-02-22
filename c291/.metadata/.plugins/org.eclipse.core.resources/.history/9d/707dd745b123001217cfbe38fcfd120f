@@ -1,0 +1,67 @@
+package admin;
+
+import InputOutput;
+import one;
+import two;
+import three;
+
+import java.util.Vector;
+
+public class Welcome {
+
+	public static void main(String[] args) {
+		
+		int exit = 0;
+		while(exit == 0){
+			int login = 0;
+			InputOutput.clearscreen();
+			
+			int logout = 0;
+			while(logout == 0){
+				System.out.println("**************************");
+				System.out.println("*    Welcome to SAML!    *");
+				System.out.println("**************************");
+				System.out.println("1. View/Edit personal info\n2. View/Edit friends\n3. Discover media\n4. Owned movies\n5. Logout\n6. Exit");
+				String command = InputOutput.read();
+
+				switch (Integer.parseInt(command)){
+				case 1:
+					one.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 2:
+					two.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 3:
+					three.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 4:
+					four.menu(username);
+					InputOutput.clearscreen();
+					break;
+				case 5:
+					logout = 1;
+					System.out.println("Logout Successful!");
+					InputOutput.threadsleep(4000);
+					InputOutput.clearscreen();
+					break;
+				case 6:
+					logout = 1;
+					exit = 1;
+					InputOutput.clearscreen();
+					System.out.println("Goodbye!");
+					break;
+				default:
+					InputOutput.invalidcom();
+					break;
+
+
+				}
+			}//Welcome screen ends here
+		}//Entire Program
+
+	}
+
+}

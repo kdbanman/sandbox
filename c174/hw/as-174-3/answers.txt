@@ -1,0 +1,19 @@
+Q1:
+
+The value of linueup will be the address (reference?) of the list that was passed by the function call, so that lineup points to the same list as the one passed by the main simulation loop.
+
+Q2:
+
+Since lineup points to the same list as the one in the main simulation loop, any changes made to lineup are also changes to the main list.  This clearly affects the simulation.
+
+Q3:
+
+To ensure that, when the line is small, the simulation will not try to process more orders than there are customers in the line.
+
+Q4:
+
+When the simulation is run in the command line, a hashable seed can be passed as an argument for the pseudorandom number generator.
+
+Q5:
+
+I took the modulus of the time and compared it to a reference value, so that only 1 of every third timestep would produce a new customer.  Whenever the time%3 was equal to zero in the appropriate time interval, a new customer entered the line.

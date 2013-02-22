@@ -1,0 +1,83 @@
+import java.util.Vector;
+
+
+public class four {
+
+	public static void menu(String username){
+		Vector<String> movies_owned = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up the movies that the user owns
+		 */
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("*************************");
+			System.out.println("* Media currently owned *");
+			System.out.println("*************************");
+			InputOutput.vectorPrint(movies_owned);
+			System.out.print("1. Rate Movie\n2. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			switch (Integer.parseInt(command)){
+			case 1:
+				rate(movies_owned);
+				InputOutput.clearscreen();
+				break;
+			case 2:
+				back = 1;
+				InputOutput.clearscreen();
+				break;
+			default:
+				InputOutput.invalidcom();
+				break;
+			}
+		}
+	}
+	private static void rate(Vector<String> movies_owned){
+		boolean validid = false;
+		Vector<String> movie_id = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up movie id
+		 */
+		int answered = 0;
+		int rating = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("****************");
+			System.out.println("* Rate a movie *");
+			System.out.println("****************");
+			InputOutput.vectorPrint(movies_owned);
+			System.out.print("Media ID: ");
+			String command = InputOutput.read();
+			//Valid id check
+			for(int i = 0; i < movie_id.size(); i++){
+				if(command.equals(movie_id.elementAt(i))){
+					validid = true;
+					answered = 1;
+				}
+			}
+			//Get rating
+			if(validid == true){
+				String movie_name = "null";
+				/*
+				 * Implement SQL code that finds movie title, using media id
+				 */
+				System.out.print(movie_name + "\nWhat is your rating?");
+				rating = Integer.parseInt(InputOutput.read());
+				if(rating >= 0 && rating <=10)// Check rating
+					System.out.println("Movie rated! Thanks!");
+				else{
+					InputOutput.invalidcom();
+					answered = 0;
+				}
+			}
+			else
+			{
+				System.out.println("Media ID invalid");
+				InputOutput.threadsleep(4000);
+			}
+		}
+	}
+}

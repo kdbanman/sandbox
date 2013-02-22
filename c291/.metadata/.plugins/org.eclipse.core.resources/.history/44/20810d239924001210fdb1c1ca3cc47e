@@ -1,0 +1,118 @@
+package user;
+
+import io.InputOutput;
+
+import java.util.Vector;
+import java.sql.*;
+
+
+public class four {
+
+	public static void menu(String username, Statement stmt){
+		Vector<String> movies_owned = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up the movies that the user owns
+		 */
+		// TEST CASES *****************************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		movies_owned.add("own1");
+		movies_owned.add("own2");
+		movies_owned.add("own3");
+		int back = 0;
+		while(back == 0){
+			InputOutput.clearscreen();
+			System.out.println("*************************");
+			System.out.println("* Media currently owned *");
+			System.out.println("*************************");
+			InputOutput.vectorPrint(movies_owned);
+			System.out.println("*************************");
+			System.out.print("1. Rate Movie\n2. Home\nChoice: ");
+			String command = InputOutput.read();
+
+			int intcommand;
+			try{
+				intcommand = Integer.parseInt(command);
+			}catch(Exception e){
+				intcommand = -1;
+			}
+			
+			switch (intcommand){
+				case 1:
+					rate(stmt);
+					InputOutput.clearscreen();
+					break;
+				case 2:
+					back = 1;
+					InputOutput.clearscreen();
+					break;
+				default:
+					InputOutput.invalidcom();
+					break;
+			}
+		}
+	}
+	private static void rate( Statement stmt){
+		Vector<String> rateable = new Vector<String>();
+		/*
+		 * Implement SQL code here (load up the vector)
+		 * load up movie id
+		 */
+		// TEST CASES *****************************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		rateable.add("rate1");
+		rateable.add("rate2");
+		rateable.add("rate3");
+		int answered = 0;
+		int rating = 0;
+		while(answered == 0){
+			InputOutput.clearscreen();
+			System.out.println("****************");
+			System.out.println("* Rate a movie *");
+			System.out.println("****************");
+			InputOutput.vectorPrint(rateable);
+			System.out.println("****************");
+			System.out.print("Choice: ");
+			String command = InputOutput.read();
+			//Valid id check
+			
+			int intcommand;
+			try{
+				intcommand = Integer.parseInt(command);
+			}catch(Exception e){
+				intcommand = -1;
+			}
+			
+			if(intcommand >= (rateable.size()+1) || intcommand <= 0){
+				InputOutput.invalidcom();
+			}
+			else
+			{
+				String movietorate = rateable.elementAt(Integer.parseInt(command)-1);
+				System.out.println("****************");
+				System.out.print("You are rating: "+movietorate+"\nWhat is your rating for it?: ");
+				System.out.println("ATTENTION: rating must be valid (Rating Scale: 1-10)");
+				command = InputOutput.read();
+				int ratingcommand;
+				try{
+					ratingcommand = Integer.parseInt(command);
+				}catch(Exception e){
+					ratingcommand = -1;
+				}
+				/*
+				 * Implement SQL command, rate movietorate
+				 */
+				if(ratingcommand >= 0 && ratingcommand <=10)// Check rating
+				{
+					System.out.println("Movie rated! Thanks!");
+					InputOutput.threadsleep(4000);
+					answered = 1;
+				}
+				else{
+					InputOutput.invalidcom();
+					answered = 0;
+				}
+			}
+		}
+
+	}
+}
+

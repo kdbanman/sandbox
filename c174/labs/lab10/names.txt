@@ -1,0 +1,18 @@
+---- city: Edmonton
+---- province: Alberta
+Smith,	Raymond
+Szczesny,	Julia
+Smith,	Rachel
+Barbosa,	 Denilson
+Tremblay,	Sophie
+Wilson,	Gregory
+Walters,	Mark
+---- city: Vancouver
+---- province: BC
+Harvey,	Karen
+Li,	Russ
+Smith,	Michael
+Ng,	Andre
+Barbosa,	Anita
+Turner,	Jeremy
+Lam,	Annette

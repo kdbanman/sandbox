@@ -1,0 +1,97 @@
+package admin;
+
+import java.sql.*;
+import java.util.Vector;
+
+public class three {
+	public static void menu(Connection m_con) throws SQLException{
+		Statement stmt = InputOutput.newStatement(m_con);
+		int back = 0;
+		while(back == 0){
+		
+			String query = "select mid, title, quantity from media, movie where id=mid";
+			ResultSet rs =InputOutput.execQuery(stmt, query);
+			Vector<String> movies = new Vector<String>();
+			Vector<Integer> validIds = new Vector<Integer>();
+			
+			while (rs.next()) {
+				validIds.add(rs.getInt("mid"));
+				String mid = rs.getString("mid");
+				while (mid.length() < 21) {
+					mid = mid + " ";
+				}
+				String title = rs.getString("title");
+				while (title.length() < 21) {
+					title = title + " ";
+				}
+				String quantity = rs.getString("quantity");
+				String printRow = mid + title + quantity;
+				movies.add(printRow);
+			}
+			
+			InputOutput.clearscreen();
+			System.out.println("*******************************");
+			System.out.println("*   Adjust movie quantities   *");
+			System.out.println("*******************************\n");
+			System.out.println("    MOVIE ID            MOVIE TITLE         QUANTITY AVAILABLE\n");
+			InputOutput.vectorPrint(movies);
+			System.out.print("\nChoose movie id to increase quantity available for rent: ");
+			int movieChoice = InputOutput.cleanCommand(InputOutput.read());
+			System.out.print("How many copies? ");
+			int incr = InputOutput.cleanCommand(InputOutput.read());
+			if (validIds.contains(movieChoice) && incr >= 0) {
+				int waiting = amtWaiting(m_con, movieChoice);
+				int toUpdate = Math.min(incr, waiting);
+				for (int i = 0; i < toUpdate; i++) {
+					Statement topListStmt = InputOutput.newStatement(m_con);
+					String topListQuery = "select username, movieid from waitinglist where movieid="+(movieChoice)+" and since >= all(select since from waitinglist where movieid ="+(movieChoice)+")";
+					ResultSet topList = InputOutput.execQuery(topListStmt, topListQuery);
+					String user = null;
+					int mid = -1;
+					if (topList.next()) {
+						user = topList.getString("username");
+						mid = topList.getInt("movieid");
+					} else {
+						System.out.println("Next user on waiting list could not be obtained. Updates not performed.");
+						break;
+					}
+					InputOutput.closeStatement(topListStmt);
+					Statement updStmt = InputOutput.newStatement(m_con);
+					String insQuery = "insert into rent values ('"+user+"', "+(mid)+", sysdate, 'S', 'N')";
+					String delQuery = "delete from waitinglist where username='"+user+"' and movieid="+(mid);
+					InputOutput.execUpdate(updStmt, insQuery);
+					InputOutput.execUpdate(updStmt, delQuery);
+					incr--;
+					InputOutput.closeStatement(updStmt);
+				}
+				
+				Statement amtStmt = InputOutput.newStatement(m_con);
+				String amtQuery = "update movie set quantity=quantity+" + (incr) + " where " + (movieChoice) + "=mid";
+				System.out.println(amtQuery);
+				InputOutput.execUpdate(amtStmt, amtQuery);
+				System.out.println("done");
+				InputOutput.closeStatement(amtStmt);
+				System.out.println("Updates successfully performed.");
+				InputOutput.threadsleep(3000);
+				back = 1;
+				
+			} else {
+				InputOutput.invalidcom();
+				InputOutput.threadsleep(3000);
+			}
+		}
+		InputOutput.closeStatement(stmt);
+	}
+	
+	private static int amtWaiting(Connection m_con, int movie) throws SQLException {
+		Statement amt = InputOutput.newStatement(m_con);
+		String query = "select count(*) from waitinglist where movieid=" + (movie);
+		ResultSet rs = InputOutput.execQuery(amt, query);
+		int length = 0;
+		if (rs.next()) {
+			length = rs.getInt("count(*)");
+		}
+		InputOutput.closeStatement(amt);
+		return length;
+	}
+}
