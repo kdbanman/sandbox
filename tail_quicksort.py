@@ -122,17 +122,20 @@ def partition(A, p, r):
   return i
 
 
-recurLevel = 0
+recurCall = 1
 def tail_quicksort(A, p, r):
-  global recurLevel
-  print "RECURSION LEVEL " + str(recurLevel) + "\n"
-  recurLevel += 1
+  global recurCall
+  
+  print "RECURSIVE CALL " + str(recurCall)
+  recurCall += 1
+
   if p < r:
     print "NOW SORTING ARRAY FROM p TO r:"
     prPrint(A, p, r)
     raw_input()
 
   while p < r:
+
     q = partition(A, p, r)
 
     print("DONE PARTITIONING ABOUT INDEX q:")
